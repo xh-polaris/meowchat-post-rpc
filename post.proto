@@ -4,8 +4,74 @@ package post;
 
 option go_package='./pb';
 
-message UserPreview {
+message User {
   string id = 1;
   string nickname = 2;
   string avatarUrl = 3;
+}
+
+message Tag {
+  string id = 1;
+  string name = 2;
+}
+
+message Post {
+  string id = 1;
+  int64 createAt = 2;
+  bool isAnonymous = 3;
+  string title = 4;
+  string text = 5;
+  string coverUrl = 6;
+  repeated Tag tags = 7;
+  int64 likes = 8;
+  int64 comments = 9;
+  User user = 10;
+  int64 status = 11;
+}
+
+message GetManyPostReq {
+  string communityId = 1;
+  int64 count = 2; // 获取的数量
+}
+
+message GetManyPostResp {
+  repeated Post posts = 1;
+}
+
+message GetPostReq {
+  string communityId = 1;
+}
+
+message GetPostResp {
+  Post post = 1;
+}
+
+message AddPostReq {
+  Post post = 1;
+}
+
+message AddPostResp {
+  string postId = 1;
+}
+
+message UpdatePostReq {
+  Post post = 1;
+}
+
+message UpdatePostResp {
+}
+
+message DeletePostReq {
+  string postId = 1;
+}
+
+message DeletePostResp {
+}
+
+service post {
+  rpc GetManyPost(GetManyPostReq) returns (GetManyPostResp);
+  rpc GetPost(GetPostReq) returns (GetPostResp);
+  rpc AddPost(AddPostReq) returns (AddPostResp);
+  rpc UpdatePost(UpdatePostReq) returns (UpdatePostResp);
+  rpc DeletePost(DeletePostReq) returns (DeletePostResp);
 }
