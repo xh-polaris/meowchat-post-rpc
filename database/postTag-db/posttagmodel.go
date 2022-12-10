@@ -14,7 +14,7 @@ type (
 	PostTagModel interface {
 		postTagModel
 		Insertx(data *PostTag) (sql.Result, error)
-		Deletex(data *PostTag) error
+		Deletex(postId string) error
 		Findx(postId int64) ([]int, error)
 	}
 

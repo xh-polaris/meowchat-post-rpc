@@ -17,54 +17,55 @@ message Post {
   string text = 5;
   string coverUrl = 6;
   repeated Tag tags = 7;
-  string userId = 8;
+  int64 user_id = 8;
   int64 status = 9;
+  bool is_delete=10;
+  int64 deleteAt=11;
 }
 
-message GetManyPostReq {
-  string communityId = 1;
+message ListReq {
+  int64 skip = 1;
   int64 count = 2; // 获取的数量
 }
 
-message GetManyPostResp {
+message ListResp {
   repeated Post posts = 1;
 }
 
-message GetPostReq {
-  string communityId = 1;
-}
-
-message GetPostResp {
-  Post post = 1;
-}
-
-message AddPostReq {
-  Post post = 1;
-}
-
-message AddPostResp {
+message RetrieveReq {
   string postId = 1;
 }
 
-message UpdatePostReq {
+message RetrieveResp {
   Post post = 1;
 }
 
-message UpdatePostResp {
+message CreatReq {
+  Post post = 1;
 }
 
-message DeletePostReq {
+message CreatResp {
   string postId = 1;
 }
 
-message DeletePostResp {
+message UpdateReq {
+  Post post = 1;
+}
+
+message UpdateResp {
+}
+
+message DestroyReq {
+  string postId = 1;
+}
+
+message DestroyResp {
 }
 
 service postRPC {
-  rpc GetManyPost(GetManyPostReq) returns (GetManyPostResp);
-  rpc GetPost(GetPostReq) returns (GetPostResp);
-  rpc AddPost(AddPostReq) returns (AddPostResp);
-  rpc UpdatePost(UpdatePostReq) returns (UpdatePostResp);
-  rpc DeletePost(DeletePostReq) returns (DeletePostResp);
+  rpc List(ListReq) returns (ListResp);
+  rpc Retrieve(RetrieveReq) returns (RetrieveResp);
+  rpc Creat(CreatReq) returns (CreatResp);
+  rpc Update(UpdateReq) returns (UpdateResp);
+  rpc Destroy(DestroyReq) returns (DestroyResp);
 }
-

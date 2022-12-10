@@ -12,8 +12,10 @@ import (
 func (m *customPostTagModel) Insertx(data *PostTag) (sql.Result, error) {
 	return m.Insert(context.Background(), data)
 }
-func (m *customPostTagModel) Deletex(data *PostTag) error {
-	return m.Delete(context.Background(), data.Id)
+func (m *customPostTagModel) Deletex(postId string) error {
+	query := fmt.Sprintf("delete from %s where `post_id` = %s", m.table, postId)
+	_, err := m.ExecNoCacheCtx(context.Background(), query)
+	return err
 }
 func (m *customPostTagModel) Findx(postId int64) ([]int, error) {
 	iyuaPostTagIdKey := fmt.Sprintf("%s%s%v", cacheIyuaPostTagIdPrefix, "postid:", postId)

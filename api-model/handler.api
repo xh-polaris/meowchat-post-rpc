@@ -1,0 +1,80 @@
+syntax = "v1"
+
+info(
+	title: "type title here"
+	desc: "type desc here"
+	author: "type author here"
+	email: "type email here"
+	version: "type version here"
+)
+
+type Tag {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type Post {
+	Id          string `json:"id"`
+	CreateAt    int64  `json:"createAt"`
+	IsAnonymous bool   `json:"isAnonymous"`
+	Title       string `json:"title"`
+	Text        string `json:"text"`
+	CoverUrl    string `json:"coverUrl"`
+	Tags        []Tag  `json:"tags"`
+	User_id     int64  `json:"userId"`
+	Status      int64  `json:"status"`
+	Is_delete   bool   `json:"isDelete"`
+	DeleteAt    int64  `json:"deleteAt"`
+}
+
+type ListReq {
+	Skip  int64 `json:"skip"`
+	Count int64 `json:"count"`
+}
+
+type ListResp {
+	Posts []Post `json:"posts"`
+}
+
+type RetrieveReq {
+	PostId string `json:"postId"`
+}
+
+type RetrieveResp {
+	Post_ Post `json:"post"`
+}
+
+type CreatReq {
+	Post_ Post `json:"post"`
+}
+
+type CreatResp {
+	PostId string `json:"postId"`
+}
+
+type UpdateReq {
+	Post_ Post `json:"post"`
+}
+
+type UpdateResp {
+}
+
+type DestroyReq {
+	PostId string `json:"postId"`
+}
+
+type DestroyResp {
+}
+
+service postAPI {
+	@handler List
+	post /list (ListReq) returns (ListResp)
+	@handler Retrieve
+	post /retrieve (RetrieveReq) returns (RetrieveResp)
+	@handler Creat
+	post /create (CreatReq) returns (CreatResp)
+	@handler Update
+	post /update (UpdateReq) returns (UpdateResp)
+	@handler Destroy
+	post /destroy (DestroyReq) returns (DestroyResp)
+}

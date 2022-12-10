@@ -1,0 +1,10 @@
+Name: post.rpc
+ListenOn: 0.0.0.0:8084
+DBTable:
+  "post" : "root:iyua@tcp(124.222.45.229:3306)/iyua"
+  "tag" : "root:iyua@tcp(124.222.45.229:3306)/iyua"
+  "post_tag" : "root:iyua@tcp(124.222.45.229:3306)/iyua"
+
+CacheRedis:
+  - Host: 0.0.0.0:6379
+    Type: node

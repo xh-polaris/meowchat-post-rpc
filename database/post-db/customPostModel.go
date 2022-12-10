@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/xh-polaris/meowchat-post-rpc/database/error_type"
+	"github.com/xh-polaris/meowchat-post-rpc/pb/pb"
+	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"golang.org/x/net/context"
 	"time"
@@ -35,4 +37,17 @@ func (m *customPostModel) FindOnex(id int64) (*Post, error) {
 		err = error_type.ErrNotFound
 	}
 	return data, err
+}
+func (m *defaultPostModel) Listx(ctx context.Context, skip int64, count int64) ([]*pb.Post, error) {
+	var resp []*pb.Post
+	query := fmt.Sprintf("select %s from %s limit ?,?", postRows, m.table)
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, skip, count)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
 }
