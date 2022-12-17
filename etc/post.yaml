@@ -1,6 +1,13 @@
-Name: post.rpc
+Name: postrpc.rpc
 ListenOn: 0.0.0.0:8080
-Etcd:
-  Hosts:
-  - 127.0.0.1:2379
-  Key: post.rpc
+Log:
+  Level: debug
+  encoding: plain
+RedisConf:
+  - Host: localhost:6379
+    Type: node
+    Pass: ""
+MongoConf:
+  Source: mongodb://test:testpassword@localhost:27017
+  DataBase: meowchat-post
+  CollPost: post

@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/xh-polaris/meowchat-post-rpc/internal/config"
-	"github.com/xh-polaris/meowchat-post-rpc/internal/server"
-	"github.com/xh-polaris/meowchat-post-rpc/internal/svc"
-	"github.com/xh-polaris/meowchat-post-rpc/pb"
+	"postRpc/internal/config"
+	"postRpc/internal/server"
+	"postRpc/internal/svc"
+	"postRpc/pb"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -26,7 +26,7 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
-		pb.RegisterPostServer(grpcServer, server.NewPostServer(ctx))
+		pb.RegisterPostRpcServer(grpcServer, server.NewPostRpcServer(ctx))
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
