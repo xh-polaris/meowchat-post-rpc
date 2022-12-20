@@ -25,7 +25,7 @@ func NewSearchPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Search
 }
 
 func (l *SearchPostLogic) SearchPost(in *pb.SearchPostReq) (*pb.SearchPostResp, error) {
-	data, err := l.svcCtx.PostModel.Search(l.ctx, in.Keyword, in.Skip, in.Count)
+	data, err := l.svcCtx.PostModel.Search(l.ctx, in.Keyword, in.Count, in.Skip)
 	if err != nil {
 		return nil, err
 	}
