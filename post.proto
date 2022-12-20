@@ -4,74 +4,97 @@ package post;
 
 option go_package='./pb';
 
-message User {
-  string id = 1;
-  string nickname = 2;
-  string avatarUrl = 3;
-}
-
-message Tag {
-  string id = 1;
-  string name = 2;
-}
-
 message Post {
   string id = 1;
   int64 createAt = 2;
-  bool isAnonymous = 3;
-  string title = 4;
-  string text = 5;
-  string coverUrl = 6;
-  repeated Tag tags = 7;
-  int64 likes = 8;
-  int64 comments = 9;
-  User user = 10;
-  int64 status = 11;
+  int64 updateAt = 3;
+  bool isAnonymous = 4;
+  string title = 5;
+  string text = 6;
+  string coverUrl = 7;
+  repeated string tags = 8;
+  string userId = 9;
+  int64 status = 10;
 }
 
-message GetManyPostReq {
-  string communityId = 1;
-  int64 count = 2; // 获取的数量
+// create a post
+message CreatePostReq {
+  bool isAnonymous = 1;
+  string title = 2;
+  string text = 3;
+  string coverUrl = 4;
+  repeated string tags = 5;
+  string userId = 6;
+  int64 status = 7;
 }
 
-message GetManyPostResp {
-  repeated Post posts = 1;
+message CreatePostResp {
+  string id = 1;
 }
 
-message GetPostReq {
-  string communityId = 1;
+// retrieve a post
+message RetrievePostReq {
+  string id = 1;
 }
 
-message GetPostResp {
+message RetrievePostResp {
   Post post = 1;
 }
 
-message AddPostReq {
-  Post post = 1;
-}
-
-message AddPostResp {
-  string postId = 1;
-}
-
+//update a post
 message UpdatePostReq {
-  Post post = 1;
+  string id = 1;
+  bool isAnonymous = 2;
+  string title = 3;
+  string text = 4;
+  string coverUrl = 5;
+  repeated string tags = 6;
+  int64 status = 7;
 }
 
 message UpdatePostResp {
 }
 
+// delete a post
 message DeletePostReq {
-  string postId = 1;
+  string id = 1;
 }
 
 message DeletePostResp {
 }
 
-service post {
-  rpc GetManyPost(GetManyPostReq) returns (GetManyPostResp);
-  rpc GetPost(GetPostReq) returns (GetPostResp);
-  rpc AddPost(AddPostReq) returns (AddPostResp);
-  rpc UpdatePost(UpdatePostReq) returns (UpdatePostResp);
-  rpc DeletePost(DeletePostReq) returns (DeletePostResp);
+// list posts
+message ListPostReq {
+  string orderBy = 1;
+  int64 skip = 2;
+  int64 limit = 3; // 获取的数量
+}
+
+message ListPostResp {
+  repeated Post posts = 1;
+}
+
+// list posts by user_id & isAnonymous & status
+message ListPostByUserAndPvtAndStatReq{
+  string userId = 1;
+  bool isAnonymous = 2; // 1 实名 0 匿名
+  int64 status = 3; // -1 全部 0 审核中 1 过审 2 不过审
+  int64 skip = 4;
+  int64 limit = 5;
+}
+
+message ListPostByUserAndPvtAndStatResp{
+  repeated Post posts = 1;
+}
+
+
+
+
+service post_rpc {
+  rpc CreatePost(CreatePostReq) returns(CreatePostResp);
+  rpc RetrievePost(RetrievePostReq) returns(RetrievePostResp);
+  rpc UpdatePost(UpdatePostReq) returns(UpdatePostResp);
+  rpc DeletePost(DeletePostReq) returns(DeletePostResp);
+  rpc ListPost(ListPostReq) returns(ListPostResp);
+  rpc ListPostByUserAndPvtAndStat(ListPostByUserAndPvtAndStatReq) returns(ListPostByUserAndPvtAndStatResp);
 }
