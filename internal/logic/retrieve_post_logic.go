@@ -2,31 +2,38 @@ package logic
 
 import (
 	"context"
-	"postRpc/internal/common"
-	"postRpc/internal/svc"
-	"postRpc/pb"
+
+	"github.com/xh-polaris/meowchat-post-rpc/errorx"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/common"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/model"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-post-rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type RetrievepostLogic struct {
+type RetrievePostLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewRetrievePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RetrievepostLogic {
-	return &RetrievepostLogic{
+func NewRetrievePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RetrievePostLogic {
+	return &RetrievePostLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *RetrievepostLogic) RetrievePost(in *pb.RetrievePostReq) (*pb.RetrievePostResp, error) {
-	one, err := l.svcCtx.PostModel.FindOne(l.ctx, in.Id)
-	if err != nil {
+func (l *RetrievePostLogic) RetrievePost(in *pb.RetrievePostReq) (*pb.RetrievePostResp, error) {
+	data, err := l.svcCtx.PostModel.FindOne(l.ctx, in.PostId)
+	switch err {
+	case nil:
+	case model.ErrNotFound:
+		return nil, errorx.ErrNoSuchPost
+	default:
 		return nil, err
 	}
-	return &pb.RetrievePostResp{Post: common.PostTransform(one)}, nil
+	return &pb.RetrievePostResp{Post: common.PostTransform(data)}, nil
 }

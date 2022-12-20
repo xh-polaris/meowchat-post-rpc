@@ -2,38 +2,40 @@ package logic
 
 import (
 	"context"
+	"github.com/xh-polaris/meowchat-post-rpc/errorx"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/model"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-post-rpc/pb"
 	"github.com/zeromicro/go-zero/core/logx"
-	"postRpc/internal/svc"
-	"postRpc/pb"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type UpdatepostLogic struct {
+type UpdatePostLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewUpdatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdatepostLogic {
-	return &UpdatepostLogic{
+func NewUpdatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdatePostLogic {
+	return &UpdatePostLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *UpdatepostLogic) UpdatePost(in *pb.UpdatePostReq) (*pb.UpdatePostResp, error) {
-
-	data, err := l.svcCtx.PostModel.FindOne(l.ctx, in.Id)
+func (l *UpdatePostLogic) UpdatePost(in *pb.UpdatePostReq) (*pb.UpdatePostResp, error) {
+	oid, err := primitive.ObjectIDFromHex(in.Id)
 	if err != nil {
-		return nil, err
+		return nil, errorx.ErrInvalidObjectId
 	}
-	data.IsAnonymous = in.IsAnonymous
-	data.Title = in.Title
-	data.Text = in.Text
-	data.CoverUrl = in.CoverUrl
-	data.Tags = in.Tags
-	data.Status = in.Status
-	err = l.svcCtx.PostModel.Update(l.ctx, data)
+	err = l.svcCtx.PostModel.Update(l.ctx, &model.Post{
+		ID:       oid,
+		Title:    in.Title,
+		Text:     in.Text,
+		CoverUrl: in.CoverUrl,
+		Tags:     in.Tags,
+	})
 	if err != nil {
 		return nil, err
 	}

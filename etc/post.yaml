@@ -1,13 +1,16 @@
-Name: postrpc.rpc
+Name: post.rpc
 ListenOn: 0.0.0.0:8080
+Mode: dev
 Log:
+  Encoding: plain
   Level: debug
-  encoding: plain
-RedisConf:
-  - Host: localhost:6379
-    Type: node
-    Pass: ""
-MongoConf:
-  Source: mongodb://test:testpassword@localhost:27017
-  DataBase: meowchat-post
-  CollPost: post
+Mongo:
+  URL: mongo://root:password@127.0.0.1:27017
+  DB: db
+Cache:
+  - Host: 127.0.0.1:6379
+Elasticsearch:
+  Addresses:
+    - https://127.0.0.1:9200
+  Username: elastic
+  Password: password

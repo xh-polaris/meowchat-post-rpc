@@ -61,7 +61,7 @@ func (m *defaultPostModel) FindOne(ctx context.Context, id string) (*Post, error
 func (m *defaultPostModel) Update(ctx context.Context, data *Post) error {
 	data.UpdateAt = time.Now()
 	key := prefixPostCacheKey + data.ID.Hex()
-	_, err := m.conn.ReplaceOne(ctx, key, bson.M{"_id": data.ID}, data)
+	_, err := m.conn.UpdateByID(ctx, key, data.ID, bson.M{"$set": data})
 	return err
 }
 

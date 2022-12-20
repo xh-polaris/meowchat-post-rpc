@@ -8,7 +8,6 @@ message Post {
   string id = 1;
   int64 createAt = 2;
   int64 updateAt = 3;
-  bool isAnonymous = 4;
   string title = 5;
   string text = 6;
   string coverUrl = 7;
@@ -17,24 +16,33 @@ message Post {
   int64 status = 10;
 }
 
+// search posts
+message SearchPostReq {
+  int64 skip = 1;
+  int64 count = 2; // 获取的数量
+  string keyword = 3;
+}
+
+message SearchPostResp {
+  repeated Post posts = 1;
+}
+
 // create a post
 message CreatePostReq {
-  bool isAnonymous = 1;
   string title = 2;
   string text = 3;
   string coverUrl = 4;
   repeated string tags = 5;
   string userId = 6;
-  int64 status = 7;
 }
 
 message CreatePostResp {
-  string id = 1;
+  string postId = 1;
 }
 
 // retrieve a post
 message RetrievePostReq {
-  string id = 1;
+  string postId = 1;
 }
 
 message RetrievePostResp {
@@ -44,12 +52,10 @@ message RetrievePostResp {
 //update a post
 message UpdatePostReq {
   string id = 1;
-  bool isAnonymous = 2;
   string title = 3;
   string text = 4;
   string coverUrl = 5;
   repeated string tags = 6;
-  int64 status = 7;
 }
 
 message UpdatePostResp {
@@ -65,36 +71,32 @@ message DeletePostResp {
 
 // list posts
 message ListPostReq {
-  string orderBy = 1;
-  int64 skip = 2;
-  int64 limit = 3; // 获取的数量
+  int64 skip = 1;
+  int64 count = 2; // 获取的数量
 }
 
 message ListPostResp {
   repeated Post posts = 1;
 }
 
-// list posts by user_id & isAnonymous & status
-message ListPostByUserAndPvtAndStatReq{
+// list posts by userId & status
+message ListPostByUserIdReq{
   string userId = 1;
-  bool isAnonymous = 2; // 1 实名 0 匿名
   int64 status = 3; // -1 全部 0 审核中 1 过审 2 不过审
   int64 skip = 4;
-  int64 limit = 5;
+  int64 count = 5;
 }
 
-message ListPostByUserAndPvtAndStatResp{
+message ListPostByUserIdResp{
   repeated Post posts = 1;
 }
 
-
-
-
 service post_rpc {
+  rpc SearchPost(SearchPostReq) returns(SearchPostResp);
   rpc CreatePost(CreatePostReq) returns(CreatePostResp);
   rpc RetrievePost(RetrievePostReq) returns(RetrievePostResp);
   rpc UpdatePost(UpdatePostReq) returns(UpdatePostResp);
   rpc DeletePost(DeletePostReq) returns(DeletePostResp);
   rpc ListPost(ListPostReq) returns(ListPostResp);
-  rpc ListPostByUserAndPvtAndStat(ListPostByUserAndPvtAndStatReq) returns(ListPostByUserAndPvtAndStatResp);
+  rpc ListPostByUserId(ListPostByUserIdReq) returns(ListPostByUserIdResp);
 }

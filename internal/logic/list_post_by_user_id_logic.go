@@ -10,22 +10,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListPostLogic struct {
+type ListPostByUserIdLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewListPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListPostLogic {
-	return &ListPostLogic{
+func NewListPostByUserIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListPostByUserIdLogic {
+	return &ListPostByUserIdLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *ListPostLogic) ListPost(in *pb.ListPostReq) (*pb.ListPostResp, error) {
-	data, err := l.svcCtx.PostModel.FindMany(l.ctx, in.Skip, in.Count)
+func (l *ListPostByUserIdLogic) ListPostByUserId(in *pb.ListPostByUserIdReq) (*pb.ListPostByUserIdResp, error) {
+	data, err := l.svcCtx.PostModel.FindManyByUserId(l.ctx, in.UserId, in.Status, in.Skip, in.Count)
 	if err != nil {
 		return nil, err
 	}
@@ -33,5 +33,5 @@ func (l *ListPostLogic) ListPost(in *pb.ListPostReq) (*pb.ListPostResp, error) {
 	for _, val := range data {
 		res = append(res, common.PostTransform(val))
 	}
-	return &pb.ListPostResp{Posts: res}, nil
+	return &pb.ListPostByUserIdResp{Posts: res}, nil
 }

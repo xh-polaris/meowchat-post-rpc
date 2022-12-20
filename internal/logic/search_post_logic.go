@@ -10,22 +10,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ListPostLogic struct {
+type SearchPostLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewListPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListPostLogic {
-	return &ListPostLogic{
+func NewSearchPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SearchPostLogic {
+	return &SearchPostLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *ListPostLogic) ListPost(in *pb.ListPostReq) (*pb.ListPostResp, error) {
-	data, err := l.svcCtx.PostModel.FindMany(l.ctx, in.Skip, in.Count)
+func (l *SearchPostLogic) SearchPost(in *pb.SearchPostReq) (*pb.SearchPostResp, error) {
+	data, err := l.svcCtx.PostModel.Search(l.ctx, in.Keyword, in.Skip, in.Count)
 	if err != nil {
 		return nil, err
 	}
@@ -33,5 +33,5 @@ func (l *ListPostLogic) ListPost(in *pb.ListPostReq) (*pb.ListPostResp, error) {
 	for _, val := range data {
 		res = append(res, common.PostTransform(val))
 	}
-	return &pb.ListPostResp{Posts: res}, nil
+	return &pb.SearchPostResp{Posts: res}, nil
 }

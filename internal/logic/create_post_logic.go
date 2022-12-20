@@ -2,39 +2,38 @@ package logic
 
 import (
 	"context"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/model"
+	"github.com/xh-polaris/meowchat-post-rpc/internal/svc"
+	"github.com/xh-polaris/meowchat-post-rpc/pb"
 	"github.com/zeromicro/go-zero/core/logx"
-	"postRpc/internal/model"
-	"postRpc/internal/svc"
-	"postRpc/pb"
 )
 
-type CreatepostLogic struct {
+type CreatePostLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewCreatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreatepostLogic {
-	return &CreatepostLogic{
+func NewCreatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreatePostLogic {
+	return &CreatePostLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *CreatepostLogic) CreatePost(in *pb.CreatePostReq) (*pb.CreatePostResp, error) {
-	var modelPost = model.Post{
-		IsAnonymous: in.IsAnonymous,
-		Title:       in.Title,
-		Text:        in.Text,
-		CoverUrl:    in.CoverUrl,
-		Tags:        in.Tags,
-		UserId:      in.UserId,
-		Status:      in.Status,
+func (l *CreatePostLogic) CreatePost(in *pb.CreatePostReq) (*pb.CreatePostResp, error) {
+	post := &model.Post{
+		Title:    in.Title,
+		Text:     in.Text,
+		CoverUrl: in.CoverUrl,
+		Tags:     in.Tags,
+		UserId:   in.UserId,
+		Status:   0,
 	}
-	err := l.svcCtx.PostModel.Insert(l.ctx, &modelPost)
+	err := l.svcCtx.PostModel.Insert(l.ctx, post)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CreatePostResp{Id: modelPost.ID.Hex()}, nil
+	return &pb.CreatePostResp{PostId: post.ID.Hex()}, nil
 }
