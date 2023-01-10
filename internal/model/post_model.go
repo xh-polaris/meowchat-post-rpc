@@ -5,13 +5,14 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/xh-polaris/meowchat-post-rpc/internal/config"
 
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/cache"
@@ -31,9 +32,10 @@ type (
 	// and implement the added methods in customPostModel.
 	PostModel interface {
 		postModel
-		FindMany(ctx context.Context, skip int64, count int64) ([]*Post, error)
-		FindManyByUserId(ctx context.Context, userId string, status int64, skip int64, count int64) ([]*Post, error)
+		FindMany(ctx context.Context, skip int64, count int64) ([]*Post, int64, error)
+		FindManyByUserId(ctx context.Context, userId string, status int64, skip int64, count int64) ([]*Post, int64, error)
 		Search(ctx context.Context, keyword string, count, skip int64) ([]*Post, error)
+		SearchCount(ctx context.Context, keyword string, count, skip int64) (int64, error)
 	}
 
 	customPostModel struct {
@@ -62,8 +64,9 @@ func NewPostModel(url, db string, c cache.CacheConf, es config.ElasticsearchConf
 	}
 }
 
-func (m *customPostModel) FindManyByUserId(ctx context.Context, userId string, status int64, skip int64, count int64) ([]*Post, error) {
+func (m *customPostModel) FindManyByUserId(ctx context.Context, userId string, status int64, skip int64, count int64) ([]*Post, int64, error) {
 	var data []*Post
+
 	err := m.conn.Find(ctx, &data, bson.M{
 		"userId": userId,
 		"status": status,
@@ -71,17 +74,30 @@ func (m *customPostModel) FindManyByUserId(ctx context.Context, userId string, s
 		Skip:  &skip,
 		Limit: &count,
 	})
-	return data, err
+	cnt, err := m.conn.CountDocuments(ctx, bson.M{
+		"userId": userId,
+		"status": status,
+	})
+	if err != nil {
+		return nil, -1, err
+	}
+	return data, cnt, err
 }
 
-func (m *customPostModel) FindMany(ctx context.Context, skip int64, count int64) ([]*Post, error) {
+func (m *customPostModel) FindMany(ctx context.Context, skip int64, count int64) ([]*Post, int64, error) {
 	var data []*Post
 	opts := options.FindOptions{
 		Skip:  &skip,
 		Limit: &count,
 	}
-	err := m.conn.Find(ctx, &data, &bson.M{}, &opts)
-	return data, err
+	if err := m.conn.Find(ctx, &data, &bson.M{}, &opts); err != nil {
+		return nil, -1, err
+	}
+	cnt, err := m.conn.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return nil, -1, err
+	}
+	return data, cnt, err
 }
 
 func (m *customPostModel) Search(ctx context.Context, keyword string, count, skip int64) ([]*Post, error) {
@@ -159,4 +175,57 @@ func (m *customPostModel) Search(ctx context.Context, keyword string, count, ski
 		posts = append(posts, post)
 	}
 	return posts, nil
+}
+func (m *customPostModel) SearchCount(ctx context.Context, keyword string, count, skip int64) (int64, error) {
+	search := m.es.Search
+	query := map[string]any{
+		"from": skip,
+		"size": count,
+		"query": map[string]any{
+			"bool": map[string]any{
+				"must": []any{
+					map[string]any{
+						"multi_match": map[string]any{
+							"query":  keyword,
+							"fields": []string{"title", "text", "tags"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(query); err != nil {
+		return -1, err
+	}
+	res, err := search(
+		search.WithIndex(PostIndexName),
+		search.WithContext(ctx),
+		search.WithBody(&buf),
+	)
+	if err != nil {
+		return -1, err
+	}
+	defer res.Body.Close()
+
+	if res.IsError() {
+		var e map[string]interface{}
+		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
+			return -1, err
+		} else {
+			logx.Errorf("[%s] %s: %s",
+				res.Status(),
+				e["error"].(map[string]interface{})["type"],
+				e["error"].(map[string]interface{})["reason"],
+			)
+		}
+	}
+	var r map[string]any
+	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+		return -1, err
+	}
+	cnt := fmt.Sprint(r["count"])
+	number, err := strconv.ParseInt(cnt, 10, 64)
+	return number, nil
 }

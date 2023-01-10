@@ -23,36 +23,36 @@ func NewPostRpcServer(svcCtx *svc.ServiceContext) *PostRpcServer {
 }
 
 func (s *PostRpcServer) SearchPost(ctx context.Context, in *pb.SearchPostReq) (*pb.SearchPostResp, error) {
-	l := logic.NewSearchPostLogic(ctx, s.svcCtx)
+	l := logic.NewSearchpostLogic(ctx, s.svcCtx)
 	return l.SearchPost(in)
 }
 
 func (s *PostRpcServer) CreatePost(ctx context.Context, in *pb.CreatePostReq) (*pb.CreatePostResp, error) {
-	l := logic.NewCreatePostLogic(ctx, s.svcCtx)
+	l := logic.NewCreatepostLogic(ctx, s.svcCtx)
 	return l.CreatePost(in)
 }
 
 func (s *PostRpcServer) RetrievePost(ctx context.Context, in *pb.RetrievePostReq) (*pb.RetrievePostResp, error) {
-	l := logic.NewRetrievePostLogic(ctx, s.svcCtx)
+	l := logic.NewRetrievepostLogic(ctx, s.svcCtx)
 	return l.RetrievePost(in)
 }
 
 func (s *PostRpcServer) UpdatePost(ctx context.Context, in *pb.UpdatePostReq) (*pb.UpdatePostResp, error) {
-	l := logic.NewUpdatePostLogic(ctx, s.svcCtx)
+	l := logic.NewUpdatepostLogic(ctx, s.svcCtx)
 	return l.UpdatePost(in)
 }
 
 func (s *PostRpcServer) DeletePost(ctx context.Context, in *pb.DeletePostReq) (*pb.DeletePostResp, error) {
-	l := logic.NewDeletePostLogic(ctx, s.svcCtx)
+	l := logic.NewDeletepostLogic(ctx, s.svcCtx)
 	return l.DeletePost(in)
 }
 
 func (s *PostRpcServer) ListPost(ctx context.Context, in *pb.ListPostReq) (*pb.ListPostResp, error) {
-	l := logic.NewListPostLogic(ctx, s.svcCtx)
+	l := logic.NewListpostLogic(ctx, s.svcCtx)
 	return l.ListPost(in)
 }
 
 func (s *PostRpcServer) ListPostByUserId(ctx context.Context, in *pb.ListPostByUserIdReq) (*pb.ListPostByUserIdResp, error) {
-	l := logic.NewListPostByUserIdLogic(ctx, s.svcCtx)
+	l := logic.NewListpostbyuseridLogic(ctx, s.svcCtx)
 	return l.ListPostByUserId(in)
 }

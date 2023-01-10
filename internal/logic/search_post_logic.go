@@ -29,9 +29,13 @@ func (l *SearchPostLogic) SearchPost(in *pb.SearchPostReq) (*pb.SearchPostResp, 
 	if err != nil {
 		return nil, err
 	}
+	count, err := l.svcCtx.PostModel.SearchCount(l.ctx, in.Keyword, in.Count, in.Skip)
+	if err != nil {
+		return nil, err
+	}
 	res := make([]*pb.Post, 0, len(data))
 	for _, val := range data {
 		res = append(res, common.PostTransform(val))
 	}
-	return &pb.SearchPostResp{Posts: res}, nil
+	return &pb.SearchPostResp{Posts: res, Count: count}, nil
 }
